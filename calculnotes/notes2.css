@@ -1,0 +1,25 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+	background-color: #EAEAEA;
+}
+table{
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	min-width:60%;
+	
+}
+td{
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	}
+tr {
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+}

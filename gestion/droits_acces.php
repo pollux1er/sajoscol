@@ -1,0 +1,2268 @@
+<?php
+/*
+* $Id: droits_acces.php 8695 2011-12-01 14:17:11Z jjacquard $
+*
+* Copyright 2001-2011 Thomas Belliard, Laurent Delineau, Edouard Hue, Eric Lebrun
+*
+* This file is part of GEPI.
+*
+* GEPI is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* GEPI is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with GEPI; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+// Initialisation des feuilles de style après modification pour améliorer l'accessibilité
+$accessibilite="y";
+
+// Begin standart header
+$titre_page = "Droits d'accès";
+$niveau_arbo = 1;
+$gepiPathJava="./..";
+
+// Initialisations files
+require_once("../lib/initialisations.inc.php");
+
+// Resume session
+$resultat_session = $session_gepi->security_check();
+
+if ($resultat_session == 'c') {
+	header("Location: ../utilisateurs/mon_compte.php?change_mdp=yes");
+	die();
+} else if ($resultat_session == '0') {
+	header("Location: ../logout.php?auto=1");
+	die();
+}
+// Check access
+
+if (!checkAccess()) {
+	header("Location: ../logout.php?auto=1");
+	die();
+}
+
+include "../class_php/gestion/class_droit_acces_template.php";
+
+
+// ====== Initialisation des messages =====
+$tbs_message = '';
+$themessage  = 'Information was modified. Do you really want to leave without recording ?';
+// on demande une validation quitte sans enregistrer les changements
+$messageEnregistrer = $themessage;
+
+// ====== Inclusion des balises head et du bandeau =====
+
+include_once("../lib/header_template.inc");
+
+
+/****************************************************************
+			FIN HAUT DE PAGE
+****************************************************************/
+if (!suivi_ariane($_SERVER['PHP_SELF'],$titre_page))
+		echo "error during creation of the wire of ARIANE";
+/****************************************************************
+			ENREGISTREMENT DES DONNÉES SI BESOIN
+****************************************************************/
+
+// Load settings
+if (!loadSettings()) {
+	die("Error loading settings");
+}
+if (isset($_POST['OK'])) {
+  $droitAffiche= new class_droit_acces_template($_POST);
+} else {
+  $droitAffiche= new class_droit_acces_template();
+}
+//debug_var();
+
+if(isset($_POST['is_posted'])) {
+	check_token(false);
+}
+
+/*
+
+if (isset($_POST['OK'])) {
+	if (isset($_POST['GepiRubConseilProf'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("GepiRubConseilProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiRubConseilProf !";
+	}
+
+	if (isset($_POST['CommentairesTypesPP'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("CommentairesTypesPP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de CommentairesTypesPP !";
+	}
+
+	if (isset($_POST['GepiRubConseilScol'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("GepiRubConseilScol", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiRubConseilScol !";
+	}
+
+	if (isset($_POST['CommentairesTypesScol'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("CommentairesTypesScol", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de CommentairesTypesScol !";
+	}
+
+	if (isset($_POST['GepiProfImprBul'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiProfImprBul", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiProfImprBul !";
+	}
+
+	if (isset($_POST['GepiProfImprBulSettings'])) {
+		$temp = "yes";
+	} else {
+		$temp ="no";
+	}
+	if (!saveSetting("GepiProfImprBulSettings", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiProfImprBulSettings !";
+	}
+
+
+	if (isset($_POST['GepiAccesRestrAccesAppProfP'])) {
+		$temp = "yes";
+	} else {
+		$temp ="no";
+	}
+	if (!saveSetting("GepiAccesRestrAccesAppProfP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesRestrAccesAppProfP !";
+	}
+
+
+	if (isset($_POST['GepiAdminImprBulSettings'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAdminImprBulSettings", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAdminImprBulSettings !";
+	}
+
+	if (isset($_POST['GepiScolImprBulSettings'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiScolImprBulSettings", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiScolImprBulSettings !";
+	}
+
+	if (isset($_POST['GepiAccesReleveScol'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveScol", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveScol !";
+	}
+
+	if (isset($_POST['GepiAccesReleveCpe'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveCpe", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveCpe !";
+	}
+
+	if (isset($_POST['GepiAccesCdtCpeRestreint'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCdtCpeRestreint", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCdtCpeRestreint !";
+	}
+
+	if (isset($_POST['GepiAccesCdtCpe'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCdtCpe", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCdtCpe !";
+	}
+
+	if (isset($_POST['GepiAccesCdtScol'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCdtScol", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCdtScol !";
+	}
+
+	if (isset($_POST['GepiAccesCdtScolRestreint'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCdtScolRestreint", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCdtScolRestreint !";
+	}
+
+	if (isset($_POST['GepiAccesReleveProfP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveProfP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveProfP !";
+	}
+	if (isset($_POST['GepiAccesReleveProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveProf !";
+	}
+	if (isset($_POST['GepiAccesReleveProfTousEleves'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveProfTousEleves", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveProf !";
+	}
+	if (isset($_POST['GepiAccesReleveProfToutesClasses'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveProfToutesClasses", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveProfToutesClasses !";
+	}
+	if (isset($_POST['GepiAccesMoyennesProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesMoyennesProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesMoyennesProf !";
+	}
+	if (isset($_POST['GepiAccesMoyennesProfTousEleves'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesMoyennesProfTousEleves", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesMoyennesProfTousEleves !";
+	}
+	if (isset($_POST['GepiAccesMoyennesProfToutesClasses'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesMoyennesProfToutesClasses", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesMoyennesProfToutesClasses !";
+	}
+	if (isset($_POST['GepiAccesReleveEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveEleve !";
+	}
+
+if (isset($_POST['GepiAccesOptionsReleveEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesOptionsReleveEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesOptionsReleveEleve !";
+	}
+
+	if (isset($_POST['GepiAccesCahierTexteEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCahierTexteEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCahierTexteEleve !";
+	}
+
+	if (isset($_POST['GepiAccesReleveParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReleveParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReleveParent !";
+	}
+
+	if (isset($_POST['GepiAccesOptionsReleveParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesOptionsReleveParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesOptionsReleveParent !";
+	}
+
+	if (isset($_POST['GepiAccesCahierTexteParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCahierTexteParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCahierTexteParent !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitProf !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitScolarite'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitScolarite", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitScolarite !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitCpe'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitCpe", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitCpe !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitAdmin'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitAdmin", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitAdmin !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitEleve !";
+	}
+
+	if (isset($_POST['GepiPasswordReinitParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiPasswordReinitParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiPasswordReinitParent !";
+	}
+
+	if (isset($_POST['GepiAccesEquipePedaEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEquipePedaEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEquipePedaEleve !";
+	}
+
+	if (isset($_POST['GepiAccesEquipePedaParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEquipePedaParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEquipePedaParent !";
+	}
+
+	if (isset($_POST['GepiAccesEquipePedaEmailEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEquipePedaEmailEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEquipePedaEmailEleve !";
+	}
+
+	if (isset($_POST['GepiAccesCpePPEmailEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCpePPEmailEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCpePPEmailEleve !";
+	}
+
+	if (isset($_POST['GepiAccesEquipePedaEmailParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEquipePedaEmailParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEquipePedaEmailParent !";
+	}
+
+	if (isset($_POST['GepiAccesCpePPEmailParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesCpePPEmailParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesCpePPEmailParent !";
+	}
+	if (isset($_POST['GepiAccesReport cardSimpleProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimpleProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimpleProf !";
+	}
+	if (isset($_POST['GepiAccesReport cardSimpleProfTousEleves'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimpleProfTousEleves", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimpleProfTousEleves !";
+	}
+	if (isset($_POST['GepiAccesReport cardSimpleProfToutesClasses'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimpleProfToutesClasses", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimpleProfToutesClasses !";
+	}
+	if (isset($_POST['GepiAccesReport cardSimpleParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimpleParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimpleParent !";
+	}
+
+	if (isset($_POST['GepiAccesReport cardSimpleEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimpleEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimpleEleve !";
+	}
+
+	if (isset($_POST['GepiAccesGraphEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesGraphEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesGraphEleve !";
+	}
+
+	if (isset($_POST['GepiAccesGraphParent'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesGraphParent", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesGraphParent !";
+	}
+
+
+	if (isset($_POST['GepiAccesVisuToutesEquipProf'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("GepiAccesVisuToutesEquipProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesVisuToutesEquipProf !";
+	}
+
+	if (isset($_POST['GepiAccesVisuToutesEquipScol'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("GepiAccesVisuToutesEquipScol", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesVisuToutesEquipScol !";
+	}
+
+	if (isset($_POST['GepiAccesVisuToutesEquipCpe'])) {
+		$temp = 'yes';
+	} else {
+		$temp = 'no';
+	}
+	if (!saveSetting("GepiAccesVisuToutesEquipCpe", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesVisuToutesEquipCpe !";
+	}
+
+	// Années antérieures
+	if (isset($_POST['AAProfTout'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAProfTout", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAProfTout !";
+	}
+
+	if (isset($_POST['AAProfPrinc'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAProfPrinc", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAProfPrinc !";
+	}
+
+	if (isset($_POST['AAProfClasses'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAProfClasses", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAProfClasses !";
+	}
+
+	if (isset($_POST['AAProfGroupes'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAProfGroupes", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAProfGroupes !";
+	}
+
+	if (isset($_POST['AACpeTout'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AACpeTout", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AACpeTout !";
+	}
+
+	if (isset($_POST['AACpeResp'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AACpeResp", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AACpeResp !";
+	}
+
+	if (isset($_POST['AAScolTout'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAScolTout", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAScolTout !";
+	}
+
+	if (isset($_POST['AAScolResp'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAScolResp", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAScolResp !";
+	}
+
+	if (isset($_POST['AAResponsable'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAResponsable", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAResponsable !";
+	}
+
+	if (isset($_POST['AAEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("AAEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de AAEleve !";
+	}
+
+
+	if (isset($_POST['GepiAccesModifMaPhotoProfesseur'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesModifMaPhotoProfesseur", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesModifMaPhotoProfesseur !";
+	}
+
+	if (isset($_POST['GepiAccesModifMaPhotoAdministrateur'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesModifMaPhotoAdministrateur", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesModifMaPhotoAdministrateur !";
+	}
+
+	if (isset($_POST['GepiAccesModifMaPhotoScolarite'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesModifMaPhotoScolarite", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesModifMaPhotoScolarite !";
+	}
+
+	if (isset($_POST['GepiAccesModifMaPhotoCpe'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesModifMaPhotoCpe", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesModifMaPhotoCpe !";
+	}
+
+	if (isset($_POST['GepiAccesModifMaPhotoEleve'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesModifMaPhotoEleve", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesModifMaPhotoEleve !";
+	}
+
+	if (isset($_POST['GepiAccesGestElevesProfP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesGestElevesProfP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesGestElevesProfP !";
+	}
+
+	if (isset($_POST['GepiAccesGestPhotoElevesProfP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesGestPhotoElevesProfP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesGestPhotoElevesProfP !";
+	}
+
+
+	if (isset($_POST['GepiAccesReport cardSimplePP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesReport cardSimplePP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesReport cardSimplePP !";
+	}
+
+
+
+	if (isset($_POST['appreciations_types_profs'])) {
+		if (!saveSetting("appreciations_types_profs", 'yes')) {
+			$msg .= "Erreur lors de l'enregistrement de l'autorisation d'utilisation d'appréciations-types pour les ".$gepiSettings['denomination_professeurs']." !";
+		}
+	}
+	else{
+		if (!saveSetting("appreciations_types_profs", 'no')) {
+			$msg .= "Erreur lors de l'enregistrement de l'interdiction d'utilisation d'appréciations-types pour les ".$gepiSettings['denomination_professeurs']." !";
+		}
+	}
+
+	if (isset($_POST['GepiAccesSaisieEctsProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesSaisieEctsProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesSaisieEctsProf !";
+	}
+
+	if (isset($_POST['GepiAccesRecapitulatifEctsProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesRecapitulatifEctsProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesRecapitulatifEctsProf !";
+	}
+
+	if (isset($_POST['GepiAccesSaisieEctsPP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesSaisieEctsPP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesSaisieEctsPP !";
+	}
+
+	if (isset($_POST['GepiAccesSaisieEctsScolarite'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesSaisieEctsScolarite", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesSaisieEctsScolarite !";
+	}
+
+	if (isset($_POST['GepiAccesRecapitulatifEctsScolarite'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesRecapitulatifEctsScolarite", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesRecapitulatifEctsScolarite !";
+	}
+
+
+	if (isset($_POST['GepiAccesEditionDocsEctsPP'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEditionDocsEctsPP", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEditionDocsEctsPP !";
+	}
+
+	if (isset($_POST['GepiAccesEditionDocsEctsScolarite'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesEditionDocsEctsScolarite", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesEditionDocsEctsScolarite !";
+	}
+
+	if (isset($_POST['GepiAccesGestElevesProf'])) {
+		$temp = "yes";
+	} else {
+		$temp = "no";
+	}
+	if (!saveSetting("GepiAccesGestElevesProf", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de GepiAccesGestElevesProf !";
+	}
+
+	if (isset($_POST['autoriser_correction_bulletin'])) {
+		$temp = "y";
+	} else {
+		$temp = "n";
+	}
+	if (!saveSetting("autoriser_correction_bulletin", $temp)) {
+		$msg .= "Erreur lors de l'enregistrement de autoriser_correction_bulletin!";
+	}
+
+	if(getSettingValue('active_mod_discipline')=='y') {
+		if (isset($_POST['visuDiscProfClasses'])) {
+			$temp = "yes";
+		} else {
+			$temp = "no";
+		}
+		if (!saveSetting("visuDiscProfClasses", $temp)) {
+			$msg .= "Erreur lors de l'enregistrement de visuDiscProfClasses !";
+		}
+
+		if (isset($_POST['visuDiscProfGroupes'])) {
+			$temp = "yes";
+		} else {
+			$temp = "no";
+		}
+		if (!saveSetting("visuDiscProfGroupes", $temp)) {
+			$msg .= "Erreur lors de l'enregistrement de visuDiscProfGroupes !";
+		}
+	}
+
+	$tab_droits_ele_trombi=array('GepiAccesEleTrombiTousEleves',
+'GepiAccesEleTrombiElevesClasse',
+'GepiAccesEleTrombiPersonnels',
+'GepiAccesEleTrombiProfsClasse');
+	for($i=0;$i<count($tab_droits_ele_trombi);$i++) {
+		if (isset($_POST[$tab_droits_ele_trombi[$i]])) {
+			$temp = "yes";
+		} else {
+			$temp = "no";
+		}
+		if (!saveSetting("$tab_droits_ele_trombi[$i]", $temp)) {
+			$msg .= "Erreur lors de l'enregistrement de $tab_droits_ele_trombi[$i] !";
+		}
+		*/
+		/*
+		else {
+			$msg .= "Enregistrement de $tab_droits_ele_trombi[$i]=$temp !<br />";
+		}
+		*/
+		/*
+	}
+}
+
+// Load settings
+if (!loadSettings()) {
+	die("Erreur chargement settings");
+}
+if (isset($_POST['is_posted']) and ($msg=='')) $msg = "Les modifications ont été enregistrées !";
+
+//debug_var();
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+$themessage  = 'Des informations ont été modifiées. Voulez-vous vraiment quitter sans enregistrer ?';
+		*/
+//**************** EN-TETE *****************
+// End standart header
+		/*
+$titre_page = "Droits d'accès";
+require_once("../lib/header.inc");
+//**************** FIN EN-TETE *****************
+?>
+<p class='bold'><a href="index.php"<?php
+echo " onclick=\"return confirm_abandon (this, change, '$themessage')\"";
+?>><img src='../images/icons/back.png' alt='Retour' class='back_link'/> Retour</a></p>
+
+?>
+<form action="droits_acces.php" method="post" id="form1" style="width: 100%;">
+<table class='menu' style='width: 90%; margin-left: auto; margin-right: auto;' cellpadding="10" summary='Paramétrage des droits'>
+	<tr>
+		<th colspan="2">
+		Paramétrage des droits d'accès
+		</th>
+	</tr>
+	<tr>
+		<td style="font-variant: small-caps;">Un <?php echo $gepiSettings['denomination_professeur']; ?></td>
+		<td>
+			<table border='0' summary='Professeur'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveProf" id="GepiAccesReleveProf" value="yes" <?php if (getSettingValue("GepiAccesReleveProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveProf' style='cursor: pointer;'> a accès aux relevés de notes des <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne</label></td>
+			</tr>
+		 */
+$statutItem="enseignant";
+$titreItem='GepiAccesReleveProf';
+$texteItem="has access to the report booklets of ".$gepiSettings['denomination_eleves']." of classes in which he teaches";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during of the loading of '.$titreItem;
+/*
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveProfTousEleves" id="GepiAccesReleveProfTousEleves" value="yes" <?php if (getSettingValue("GepiAccesReleveProfTousEleves")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveProfTousEleves' style='cursor: pointer;'> a accès aux relevés de notes de tous les <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne (<em>si case non cochée, le <?php echo $gepiSettings['denomination_professeur']; ?> ne voit que les <?php echo $gepiSettings['denomination_eleves']; ?> de ses groupes d'enseignement et pas les autres <?php echo $gepiSettings['denomination_eleves']; ?> des classes concernées</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReleveProfTousEleves';
+$texteItem="has access to the report booklets of all the ".$gepiSettings['denomination_eleves']." of classes in which he teaches
+  <br />(<em>if box not chacked, the ".$gepiSettings['denomination_professeur']." sees only the ".$gepiSettings['denomination_eleves']." of its groups of course and not others ".$gepiSettings['denomination_eleves']." of concerned classes </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveProfToutesClasses" id="GepiAccesReleveProfToutesClasses" value="yes" <?php if (getSettingValue("GepiAccesReleveProfToutesClasses")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveProfToutesClasses' style='cursor: pointer;'> a accès aux relevés de notes des <?php echo $gepiSettings['denomination_eleves']; ?> de toutes les classes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReleveProfToutesClasses';
+$texteItem="has access to the report booklets of ".$gepiSettings['denomination_eleves']." of all the classes";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesMoyennesProf" id="GepiAccesMoyennesProf" value="yes" <?php if (getSettingValue("GepiAccesMoyennesProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesMoyennesProf' style='cursor: pointer;'> a accès aux moyennes des <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesMoyennesProf';
+$texteItem="has access to the averages of ".$gepiSettings['denomination_eleves']." of classes in which it teaches";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesMoyennesProfTousEleves" id="GepiAccesMoyennesProfTousEleves" value="yes" <?php if (getSettingValue("GepiAccesMoyennesProfTousEleves")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesMoyennesProfTousEleves' style='cursor: pointer;'> a accès aux moyennes de tous les <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne (<em>si case non cochée, le <?php echo $gepiSettings['denomination_professeur']; ?> ne voit que les <?php echo $gepiSettings['denomination_eleves']; ?> de ses groupes d'enseignement et pas les autres <?php echo $gepiSettings['denomination_eleves']; ?> des classes concernées</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesMoyennesProfTousEleves';
+$texteItem="has access to the averages of all the ".$gepiSettings['denomination_eleves']." of  classes in which it teaches
+  <br />(<em>if box not checked, the ".$gepiSettings['denomination_professeur']." sees only the ".$gepiSettings['denomination_eleves']." of its groups of course and not others ".$gepiSettings['denomination_eleves']." of concerned classes </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesMoyennesProfToutesClasses" id="GepiAccesMoyennesProfToutesClasses" value="yes" <?php if (getSettingValue("GepiAccesMoyennesProfToutesClasses")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesMoyennesProfToutesClasses' style='cursor: pointer;'> a accès aux moyennes des <?php echo $gepiSettings['denomination_eleves']; ?> de toutes les classes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesMoyennesProfToutesClasses';
+$texteItem=" has access to the averages of ".$gepiSettings['denomination_eleves']." of all the classes";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReport cardSimpleProf" id="GepiAccesReport cardSimpleProf" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimpleProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReport cardSimpleProf' style='cursor: pointer;'> a accès aux bulletins simples des <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimpleProf';
+$texteItem="has access to the simple bulletins of ".$gepiSettings['denomination_eleves']." of classes in which it teaches";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReport cardSimpleProfTousEleves" id="GepiAccesReport cardSimpleProfTousEleves" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimpleProfTousEleves")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReport cardSimpleProfTousEleves' style='cursor: pointer;'> a accès aux bulletins simples de tous les <?php echo $gepiSettings['denomination_eleves']; ?> des classes dans lesquelles il enseigne (<em>si case non cochée, le <?php echo $gepiSettings['denomination_professeur']; ?> ne voit que les <?php echo $gepiSettings['denomination_eleves']; ?> de ses groupes d'enseignement et pas les autres <?php echo $gepiSettings['denomination_eleves']; ?> des classes concernées</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimpleProfTousEleves';
+$texteItem="has access to the simple bulletins of all the ".$gepiSettings['denomination_eleves']." of classes in which he teaches
+  <br />(<em>if box not checked, the ".$gepiSettings['denomination_professeur']." sees only the ".$gepiSettings['denomination_eleves']." of his groups of course and not others ".$gepiSettings['denomination_eleves']." of concerned classes </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReport cardSimpleProfToutesClasses" id="GepiAccesReport cardSimpleProfToutesClasses" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimpleProfToutesClasses")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReport cardSimpleProfToutesClasses' style='cursor: pointer;'> a accès aux bulletins simples des <?php echo $gepiSettings['denomination_eleves']; ?> de toutes les classes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimpleProfToutesClasses';
+$texteItem="has access to the simple bulletins of ".$gepiSettings['denomination_eleves']." of all the classes";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="appreciations_types_profs" id="appreciations_types_profs" value="y" <?php if (getSettingValue("appreciations_types_profs")=='y') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='appreciations_types_profs' style='cursor: pointer;'> peut utiliser des appréciations-types sur les bulletins.</label></td>
+			</tr>
+		 */
+$titreItem='appreciations_types_profs';
+$texteItem="can use appreciation-types on the bulletins.";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="autoriser_correction_bulletin" id="autoriser_correction_bulletin" value="y" <?php if (getSettingValue("autoriser_correction_bulletin")=='y') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='autoriser_correction_bulletin' style='cursor: pointer;'> peut solliciter des corrections de ses appréciations sur les bulletins une fois la période (<em>partiellement</em>) close (<em>pour reformuler une appréciation, corriger des fautes... de frappe;</em>).</label></td>
+			</tr>
+		 */
+$titreItem='autoriser_correction_bulletin';
+$texteItem="can request the corrections of his appreciations on the bulletins once period is (<em>partially</em>) closed (<em>to reformulate an appreciation, to correct faults... of typing</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+
+$titreItem='autoriser_signalement_faute_app_prof';
+$texteItem="can announce, in open or partially closed period, (<em>to the concerned professors </em>) faults (<em>of typing;</em>) in the appreciations of the bulletins (<em>to allow them to correct before impression of the bulletins</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitProf" id="GepiPasswordReinitProf" value="yes" <?php if (getSettingValue("GepiPasswordReinitProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitProf' style='cursor: pointer;'> peut réinitialiser lui-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitProf';
+$texteItem="can re-initialize itself his lost password  (<em>if this function is activated </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesVisuToutesEquipProf" id="GepiAccesVisuToutesEquipProf" value="yes" <?php if (getSettingValue("GepiAccesVisuToutesEquipProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesVisuToutesEquipProf' style='cursor: pointer;'> a accès à la Visualisation de toutes les équipes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesVisuToutesEquipProf';
+$texteItem=" has access to the Visualization of all the teams";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAProfTout" id="AAProfTout" value="yes" <?php if (getSettingValue("AAProfTout")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAProfTout' style='cursor: pointer;'> a accès aux données d'années antérieures pour tous les <?php echo $gepiSettings['denomination_eleves']; ?></label></td>
+			</tr>
+		 */
+$titreItem='AAProfTout';
+$texteItem="has access to the data of former years for all  the ".$gepiSettings['denomination_eleves'];
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAProfClasses" id="AAProfClasses" value="yes" <?php if (getSettingValue("AAProfClasses")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAProfClasses' style='cursor: pointer;'> a accès aux données antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> des classes pour lesquelles il fournit un enseignement<br />
+				(<em>sans nécessairement avoir tous les <?php echo $gepiSettings['denomination_eleves']; ?> de la classe</em>)</label></td>
+			</tr>
+		 */
+$titreItem='AAProfClasses';
+$texteItem="has access to the former data of ".$gepiSettings['denomination_eleves']." of classes for which he provides a course
+			<br />(<em>without necessarily having all the ".$gepiSettings['denomination_eleves']." of the class</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAProfGroupes" id="AAProfGroupes" value="yes" <?php if (getSettingValue("AAProfGroupes")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAProfGroupes' style='cursor: pointer;'> a accès aux données antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> des groupes auxquels il enseigne<br />
+				(<em>il a ces <?php echo $gepiSettings['denomination_eleves']; ?> en classe</em>)
+				</label></td>
+			</tr>
+		 */
+$titreItem='AAProfGroupes';
+$texteItem="has access to the former data of ".$gepiSettings['denomination_eleves']." of groups to which he teaches
+		  <br />(<em>he has these ".$gepiSettings['denomination_eleves']." in class</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesGestElevesProf" id="GepiAccesGestElevesProf" value="yes" <?php if (getSettingValue("GepiAccesGestElevesProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesGestElevesProf' style='cursor: pointer;'> a accès aux fiches des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est professeur.</label>
+				</td>
+			</tr>
+		 */
+$titreItem='GepiAccesGestElevesProf';
+$texteItem="has access to the cards of ".$gepiSettings['denomination_eleves']." he is a professor.";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesModifMaPhotoProfesseur" id="GepiAccesModifMaPhotoProfesseur" value="yes" <?php if (getSettingValue("GepiAccesModifMaPhotoProfesseur")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesModifMaPhotoProfesseur' style='cursor: pointer;'> a le droit d'envoyer/modifier lui-même sa photo dans 'Gérer mon compte'
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesModifMaPhotoProfesseur';
+$texteItem="has the right to send/modify itself its photo in 'Manage my account'";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<?php
+				if(getSettingValue('active_mod_discipline')=='y') {
+			?>
+				<tr valign='top'>
+					<td style='border: 0px;'><input type="checkbox" name="visuDiscProfClasses" id="visuDiscProfClasses" value="yes" <?php if (getSettingValue("visuDiscProfClasses")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+					<td style='border: 0px;'><label for='visuDiscProfClasses' style='cursor: pointer;'> peut visualiser dans le module Discipline les incidents concernant les élèves de ses classes.</label><br />
+					(<span style='font-size: small;'>Par défaut un professeur ne voit que les incidents qu'il a déclaré ou le concernant directement comme protagoniste</span>)</td>
+				</tr>
+
+				<tr valign='top'>
+					<td style='border: 0px;'><input type="checkbox" name="visuDiscProfGroupes" id="visuDiscProfGroupes" value="yes" <?php if (getSettingValue("visuDiscProfGroupes")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+					<td style='border: 0px;'><label for='visuDiscProfGroupes' style='cursor: pointer;'> peut visualiser dans le module Discipline les incidents concernant les élèves de ses enseignements.</label><br />
+					(<span class='small'>Par défaut un professeur ne voit que les incidents qu'il a déclaré ou le concernant directement comme protagoniste</span>)</td>
+				</tr>
+			<?php
+				}
+			?>
+		 */
+if(getSettingValue('active_mod_discipline')=='y') {
+  
+  $titreItem='visuDiscProfClasses';
+  $texteItem="can visualize in the Discipline module the incidents concerning the students of his classes.
+	<br />(<em>By defect a professor sees only the incidents that he declared or relating to him directly like protagonist)</em>";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+  
+  $titreItem='visuDiscProfGroupes';
+  $texteItem="can visualize in the Discipline module the incidents concerning the students of his courses.
+	<br />(<em>By defect a professor sees only the incidents that he declared or relating to him directly like protagonist)</em>";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+
+	if(getSettingValue('active_mod_ooo')=='y') {
+		$titreItem='imprDiscProfRetenueOOo';
+		$texteItem="can print in the Discipline module a request for Reserve the OpenOffice format for a student for which the professor type an incident";
+		if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+			$tbs_message = 'Error during the loading of '.$titreItem;
+	}
+}
+/*
+      
+      <!-- ECTS -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesSaisieEctsProf" id="GepiAccesSaisieEctsProf" value="yes" <?php if (getSettingValue("GepiAccesSaisieEctsProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesSaisieEctsProf' style='cursor: pointer;'> a accès à la pré-saisie des mentions ECTS pour ses groupes.</label></td>
+			</tr>
+		 */
+  $titreItem='GepiAccesSaisieEctsProf';
+  $texteItem="has access to pre-typing of ECTS mentions for his groups.";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+/* 
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesRecapitulatifEctsProf" id="GepiAccesRecapitulatifEctsProf" value="yes" <?php if (getSettingValue("GepiAccesRecapitulatifEctsProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesRecapitulatifEctsProf' style='cursor: pointer;'> a accès aux récapitulatifs globaux des crédits ECTS pour ses classes.</label></td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+		 */
+  $titreItem='GepiAccesRecapitulatifEctsProf';
+  $texteItem="has access to the total summaries of ECTS credit for his classes.";
+
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+
+if(getSettingValue('active_mod_ooo')=='y') {
+  $titreItem='OOoUploadProf';
+  $texteItem="has access to the upload OpenOffice personal models .";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+}
+//=======================================================================================
+/*
+ *
+ *
+ *
+ *
+	<tr>
+		<!-- Professeur principal-->
+		<td style="font-variant: small-caps;">Un <?php echo getSettingValue("gepi_prof_suivi"); ?></td>
+		<td>
+			<table border='0' summary='Professeur principal'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiRubConseilProf" id="GepiRubConseilProf" value="yes" <?php if (getSettingValue("GepiRubConseilProf")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiRubConseilProf' style='cursor: pointer;'> peut saisir les avis du conseil de classe pour sa classe</label></td>
+			</tr>
+		 */
+$statutItem="professeur_principal";
+$titreItem='GepiRubConseilProf';
+$texteItem="can type the opinions of the staff meeting for his class";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="CommentairesTypesPP" id="CommentairesTypesPP" value="yes" <?php if (getSettingValue("CommentairesTypesPP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='CommentairesTypesPP' style='cursor: pointer;'> peut utiliser des commentaires-types dans ces saisies d'avis du conseil de classe<br />(<em>sous réserve de pouvoir saisir les avis du conseil de classe</em>)</label></td>
+			</tr>
+		 */
+$titreItem='CommentairesTypesPP';
+$texteItem="can use comment-types in these typing of opinion of the staff meeting
+	  <br />(<em>if he is able to type the opinions of the staff meeting</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiProfImprBul" id="GepiProfImprBul" value="yes" <?php if (getSettingValue("GepiProfImprBul")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiProfImprBul' style='cursor: pointer;'> édite/imprime les bulletins périodiques des classes dont il a la charge.<br />
+				<span class='small'>(<em>Par défaut, seul un utilisateur ayant le statut scolarité peut éditer les bulletins</em>)</span></label></td>
+			</tr>
+		 */
+$titreItem='GepiProfImprBul';
+$texteItem="Edit/print periodic bulletins of the classes of which it has the charge.<br />
+			(<em>By default, only a user having the statute schooling can edit the bulletins</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiProfImprBulSettings" id="GepiProfImprBulSettings" value="yes" <?php if (getSettingValue("GepiProfImprBulSettings")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiProfImprBulSettings' style='cursor: pointer;'> a accès au paramétrage de l'impression des bulletins (<em>lorsqu'il est autorisé à éditer/imprimer les bulletins</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiProfImprBulSettings';
+$texteItem="has access to the parameter setting of the impression of the bulletins (<em>when it is authorized to edit/print the bulletins</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+
+
+
+$titreItem='autoriser_signalement_faute_app_pp';
+$texteItem="can announce, in open or partially closed period, (<em>with his/her colleagues professors</em>) faults (<em>of typing;</em>) in the appreciations of the bulletins (<em>to allow them to correct before impression of the bulletins</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+
+
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesRestrAccesAppProfP" id="GepiAccesRestrAccesAppProfP" value="yes" <?php if (getSettingValue("GepiAccesRestrAccesAppProfP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesRestrAccesAppProfP' style='cursor: pointer;'> a accès au paramétrage des accès <?php echo $gepiSettings['denomination_responsables']; ?>/<?php echo $gepiSettings['denomination_eleves']; ?> aux appréciations/avis des classes dont il est <?php echo getSettingValue("gepi_prof_suivi"); ?></label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesRestrAccesAppProfP';
+$texteItem="has access to the parameter setting of the access  ".$gepiSettings['denomination_responsables']."/".$gepiSettings['denomination_eleves']." to the appreciations/opinion of the classes of which it is ".getSettingValue("gepi_prof_suivi");
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReport cardSimplePP" id="GepiAccesReport cardSimplePP" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimplePP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReport cardSimplePP' style='cursor: pointer;'> a accès aux bulletins simples des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est <?php echo getSettingValue("gepi_prof_suivi");?></label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimplePP';
+$texteItem="has access to the simple bulletins of ".$gepiSettings['denomination_eleves']." of who he is the".getSettingValue("gepi_prof_suivi");
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveProfP" id="GepiAccesReleveProfP" value="yes" <?php if (getSettingValue("GepiAccesReleveProfP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveProfP' style='cursor: pointer;'> a accès aux relevés des classes dont il est <?php echo getSettingValue("gepi_prof_suivi"); ?></label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReleveProfP';
+$texteItem="has access to the reports booklets of the classes of which it is ".getSettingValue("gepi_prof_suivi");
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesGestElevesProfP" id="GepiAccesGestElevesProfP" value="yes" <?php if (getSettingValue("GepiAccesGestElevesProfP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesGestElevesProfP' style='cursor: pointer;'> a accès aux fiches des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est <?php echo getSettingValue("gepi_prof_suivi"); ?></label>
+				</td>
+			</tr>
+		 */
+$titreItem='GepiAccesGestElevesProfP';
+$texteItem="has access to the cards of ".$gepiSettings['denomination_eleves']." of who he is the ".getSettingValue("gepi_prof_suivi");
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'>
+				<input type="checkbox" name="GepiAccesGestPhotoElevesProfP" id="GepiAccesGestPhotoElevesProfP" value="yes" <?php if (getSettingValue("GepiAccesGestPhotoElevesProfP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' />
+				</td>
+				<td style='border: 0px;'><label for='GepiAccesGestPhotoElevesProfP' style='cursor: pointer;'>
+				 a accès à l'upload des photos de ses <?php echo $gepiSettings['denomination_eleves']; ?> si le module trombinoscope est activé et si le <?php echo $gepiSettings['denomination_professeur']; ?> a accès aux fiches <?php echo $gepiSettings['denomination_eleves']; ?> (<em>ci-dessus</em>).</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesGestPhotoElevesProfP';
+$texteItem=" has access to the upload of photo of its ".$gepiSettings['denomination_eleves']." if the module trombinoscope is activated and if the ".$gepiSettings['denomination_professeur']." has access to the cards
+		".$gepiSettings['denomination_eleves']." (<em>above</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAProfPrinc" id="AAProfPrinc" value="yes" <?php if (getSettingValue("AAProfPrinc")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAProfPrinc' style='cursor: pointer;'> a accès aux données d'années antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est <?php echo $gepiSettings['denomination_professeur']; ?> principal</label></td>
+			</tr>
+		 */
+$titreItem='AAProfPrinc';
+$texteItem="has access to the data of former years of ".$gepiSettings['denomination_eleves']." for who he is the principal ".$gepiSettings['denomination_professeur']."";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+      
+      <!-- ECTS -->
+      <tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesSaisieEctsPP" id="GepiAccesSaisieEctsPP" value="yes" <?php if (getSettingValue("GepiAccesSaisieEctsPP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesSaisieEctsPP' style='cursor: pointer;'> peut saisir les crédits ECTS pour sa classe</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesSaisieEctsPP';
+$texteItem="can type ECTS credits for his class";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+ *  <tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEditionDocsEctsPP" id="GepiAccesEditionDocsEctsPP" value="yes" <?php if (getSettingValue("GepiAccesEditionDocsEctsPP")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEditionDocsEctsPP' style='cursor: pointer;'> peut éditer les relevés ECTS pour sa classe</label></td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+		 */
+$titreItem='GepiAccesEditionDocsEctsPP';
+$texteItem="can edit ECTS reports booklets for its class";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+
+$titreItem='modExbPP';
+$texteItem="can create practice tests for the classes of which it is ".getSettingValue('gepi_prof_suivi');
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+/*
+
+ * <tr>
+		<td style="font-variant: small-caps;">La scolarité</td>
+		<td>
+			<table border='0' summary='Scolarité'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiRubConseilScol" id="GepiRubConseilScol" value="yes" <?php if (getSettingValue("GepiRubConseilScol")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiRubConseilScol' style='cursor: pointer;'> peut saisir les avis du conseil de classe</label></td>
+			</tr>
+		 */
+$statutItem="scolarite";
+$titreItem='GepiRubConseilScol';
+$texteItem="can type the opinions of the staff meeting";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="CommentairesTypesScol" id="CommentairesTypesScol" value="yes" <?php if (getSettingValue("CommentairesTypesScol")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='CommentairesTypesScol' style='cursor: pointer;'> peut utiliser des commentaires-types dans ces saisies d'avis du conseil de classe<br />(<em>sous réserve de pouvoir saisir les avis du conseil de classe</em>)</label></td>
+			</tr>
+		 */
+$titreItem='CommentairesTypesScol';
+$texteItem="can use comment-types in these typing of opinion of the staff meeting<br />
+			(<em>if he is able to type the opinions of the staff meeting</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiScolImprBulSettings" id="GepiScolImprBulSettings" value="yes" <?php if (getSettingValue("GepiScolImprBulSettings")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiScolImprBulSettings' style='cursor: pointer;'> a accès au paramétrage de l'impression des bulletins</label></td>
+			</tr>
+		 */
+$titreItem='GepiScolImprBulSettings';
+$texteItem="has access to the parameter setting of the impression of the bulletins";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+
+
+$titreItem='autoriser_signalement_faute_app_scol';
+$texteItem="can announce, in open or partially closed period, (<em>to professors concerned</em>) faults (<em>of typing;</em>) in the appreciations of the bulletins (<em>to allow them to correct before impression of the bulletins</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveScol" id="GepiAccesReleveScol" value="yes" <?php if (getSettingValue("GepiAccesReleveScol")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveScol' style='cursor: pointer;'> a accès à tous les relevés de notes de toutes les classes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesReleveScol';
+$texteItem="has access to all the report booklets of all the classes ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCdtScol" id="GepiAccesCdtScol" value="yes" <?php if (getSettingValue("GepiAccesCdtScol")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCdtScol' style='cursor: pointer;'> a accès à tous les cahiers de textes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCdtScol';
+$texteItem="has access to all the textbooks ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCdtScolRestreint" id="GepiAccesCdtScolRestreint" value="yes" <?php if (getSettingValue("GepiAccesCdtScolRestreint")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCdtScolRestreint' style='cursor: pointer;'> a accès aux cahiers de textes des <?php echo $gepiSettings['denomination_eleves']; ?> dont il a la responsabilité<br /><em>bloque l'affichage des cahiers de textes de toutes les classes</em></label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCdtScolRestreint';
+$texteItem="has access to the textbooks of ".$gepiSettings['denomination_eleves']." for which it has the responsibility<br />
+			<em>block the display of the textbooks of all the classes</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+// ====== Visa des cahiers de texte =====
+$titreItem='GepiAccesCdtVisa';
+$texteItem="Can sign the textbooks ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+// ====== Droits sur la page cahiers de texte =====
+if (getSettingValue('GepiAccesCdtScolRestreint') =='yes'
+		||getSettingValue('GepiAccesCdtScol')=='yes'
+		||getSettingValue('GepiAccesCdtVisa')=='yes'){
+  // il faut pouvoir voir les cahiers de textes
+  if (!$droitAffiche->ouvreDroits($statutItem, '', "/cahier_texte_2/see_all.php",'yes'))
+	$tbs_message = "Error during recording of the rights of /cahier_texte_2/see_all.php";
+  if (!$droitAffiche->ouvreDroits($statutItem, '', "/cahier_texte/see_all.php",'yes'))
+	$tbs_message = "Error during recording of the rights of /cahier_texte/see_all.php";
+} else {
+  // il ne faut pas pouvoir voir les cahiers de textes même en accès direct à la page
+  if (!$droitAffiche->ouvreDroits($statutItem, '', "/cahier_texte_2/see_all.php",'no'))
+	$tbs_message = "Error during recording of the rights of /cahier_texte_2/see_all.php";
+  if (!$droitAffiche->ouvreDroits($statutItem, '', "/cahier_texte/see_all.php",'no'))
+	$tbs_message = "Error during recording of the rights of /cahier_texte/see_all.php";
+}
+
+// ====== Droits sur la page Visa des cahiers de texte =====
+if (!$droitAffiche->ouvreDroits($statutItem, $titreItem, "/cahier_texte_admin/visa_ct.php"))
+  $tbs_message = "Error during recording of the rights of ".$titreItem;
+
+
+
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitScolarite" id="GepiPasswordReinitScolarite" value="yes" <?php if (getSettingValue("GepiPasswordReinitScolarite")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitScolarite' style='cursor: pointer;'> peut réinitialiser elle-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitScolarite';
+$texteItem="can re-initialize itself his lost password  (<em>if the function is activated </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesVisuToutesEquipScol" id="GepiAccesVisuToutesEquipScol" value="yes" <?php if (getSettingValue("GepiAccesVisuToutesEquipScol")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesVisuToutesEquipScol' style='cursor: pointer;'> a accès à la Visualisation de toutes les équipes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesVisuToutesEquipScol';
+$texteItem="has access to the Visualization of all the teams ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAScolTout" id="AAScolTout" value="yes" <?php if (getSettingValue("AAScolTout")=='yes') echo 'checked="checked"'; ?> /></td>
+				<td style='border: 0px;'><label for='AAScolTout' style='cursor: pointer;'> a accès aux données d'années antérieures de tous les <?php echo $gepiSettings['denomination_eleves']; ?></label></td>
+			</tr>
+		 */
+$titreItem='AAScolTout';
+$texteItem="has access to the data of former years of all the ".$gepiSettings['denomination_eleves'];
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAScolResp" id="AAScolResp" value="yes" <?php if (getSettingValue("AAScolResp")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAScolResp' style='cursor: pointer;'> a accès aux données d'années antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> des classes dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='AAScolResp';
+$texteItem="has access to the data of former years of ".$gepiSettings['denomination_eleves']." of classes of which it is responsible";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesModifMaPhotoScolarite" id="GepiAccesModifMaPhotoScolarite" value="yes" <?php if (getSettingValue("GepiAccesModifMaPhotoScolarite")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesModifMaPhotoScolarite' style='cursor: pointer;'> a le droit d'envoyer/modifier lui-même sa photo dans 'Gérer mon compte'
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesModifMaPhotoScolarite';
+$texteItem="has the right to send/modify itself its photograph in 'Manage my account'";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+$titreItem='GepiAccesTouteFicheEleveScolarite';
+$texteItem="has the right of access to all the student cards ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+/*
+
+           	<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesSaisieEctsScolarite" id="GepiAccesSaisieEctsScolarite" value="yes" <?php if (getSettingValue("GepiAccesSaisieEctsScolarite")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesSaisieEctsScolarite' style='cursor: pointer;'> peut saisir les crédits ECTS</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesSaisieEctsScolarite';
+$texteItem="can type the ECTS crédits ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+/*
+
+           	<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEditionDocsEctsScolarite" id="GepiAccesEditionDocsEctsScolarite" value="yes" <?php if (getSettingValue("GepiAccesEditionDocsEctsScolarite")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEditionDocsEctsScolarite' style='cursor: pointer;'> peut éditer les relevés d'ECTS</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEditionDocsEctsScolarite';
+$texteItem="can edit the reports of ECTS";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+      <tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesRecapitulatifEctsScolarite" id="GepiAccesRecapitulatifEctsScolarite" value="yes" <?php if (getSettingValue("GepiAccesRecapitulatifEctsScolarite")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesRecapitulatifEctsScolarite' style='cursor: pointer;'> a accès aux récapitulatifs globaux des crédits ECTS.</label></td>
+			</tr>
+
+		 */
+$titreItem='GepiAccesRecapitulatifEctsScolarite';
+$texteItem="has access to the total summaries of ECTS credits .";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+if(getSettingValue('active_mod_ooo')=='y') {
+  $titreItem='OOoUploadScol';
+  $texteItem="has access to the upload personal OpenOffice model.";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of'.$titreItem;
+}
+//=======================================================================================
+/*
+      
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td style="font-variant: small-caps;">Un CPE</td>
+		<td>
+			<table border='0' summary='CPE'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveCpe" id="GepiAccesReleveCpe" value="yes" <?php if (getSettingValue("GepiAccesReleveCpe")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveCpe' style='cursor: pointer;'> a accès à tous les relevés de notes de toutes les classes</label></td>
+			</tr>
+		 */
+$statutItem="cpe";
+$titreItem='GepiAccesReleveCpe';
+$texteItem="has access to all the report booklets of all the classes ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCdtCpe" id="GepiAccesCdtCpe" value="yes" <?php if (getSettingValue("GepiAccesCdtCpe")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCdtCpe' style='cursor: pointer;'> a accès aux cahiers de textes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCdtCpe';
+$texteItem="has access to the textbooks ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCdtCpeRestreint" id="GepiAccesCdtCpeRestreint" value="yes" <?php if (getSettingValue("GepiAccesCdtCpeRestreint")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCdtCpeRestreint' style='cursor: pointer;'> a accès aux cahiers de textes des <?php echo $gepiSettings['denomination_eleves']; ?> dont il a la responsabilité<br /><em>bloque l'affichage des cahiers de textes de toutes les classes</em></label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCdtCpeRestreint';
+$texteItem="has access to the textbooks of ".$gepiSettings['denomination_eleves']." for which it has the responsibility<br />
+			<em>block the display of the textbooks of all the classes</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+$titreItem='autoriser_signalement_faute_app_cpe';
+$texteItem="can announce, in open or partially closed period, (<em>to concerned professors </em>) faults (<em>of typing;</em>) in the appreciations of the bulletins (<em>to allow them to correct it before impression of the bulletins</em>).";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitCpe" id="GepiPasswordReinitCpe" value="yes" <?php if (getSettingValue("GepiPasswordReinitCpe")=='yes') echo 'checked="checked"'; ?> /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitCpe' style='cursor: pointer;'> peut réinitialiser lui-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitCpe';
+$texteItem="can re-initialize itself his lost password  (<em>if the function is activated </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesVisuToutesEquipCpe" id="GepiAccesVisuToutesEquipCpe" value="yes" <?php if (getSettingValue("GepiAccesVisuToutesEquipCpe")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesVisuToutesEquipCpe' style='cursor: pointer;'> a accès à la Visualisation de toutes les équipes</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesVisuToutesEquipCpe';
+$texteItem="has access to the Visualization of all the teams ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AACpeTout" id="AACpeTout" value="yes" <?php if (getSettingValue("AACpeTout")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AACpeTout' style='cursor: pointer;'> a accès aux données d'années antérieures de tous les <?php echo $gepiSettings['denomination_eleves']; ?></label></td>
+			</tr>
+		 */
+$titreItem='AACpeTout';
+$texteItem="has access to the data of former years of all the ".$gepiSettings['denomination_eleves'];
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AACpeResp" id="AACpeResp" value="yes" <?php if (getSettingValue("AACpeResp")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AACpeResp' style='cursor: pointer;'> a accès aux données d'années antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='AACpeResp';
+$texteItem="has access to the data of former years of ".$gepiSettings['denomination_eleves']." of who he is responsible ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesModifMaPhotoCpe" id="GepiAccesModifMaPhotoCpe" value="yes" <?php if (getSettingValue("GepiAccesModifMaPhotoCpe")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesModifMaPhotoCpe' style='cursor: pointer;'> a le droit d'envoyer/modifier lui-même sa photo dans 'Gérer mon compte'
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesModifMaPhotoCpe';
+$texteItem="has the right to send/modify himself his photograph in ' Managing my account'";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = ' Error during the loading of '.$titreItem;
+
+$titreItem='GepiAccesTouteFicheEleveCpe';
+$texteItem="has the right of access to all the student cards ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+$titreItem='GepiAccesAbsTouteClasseCpe';
+$texteItem="has the right of access to all the classes to type the absences";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+
+if(getSettingValue('active_mod_ooo')=='y') {
+  $titreItem='OOoUploadCpe';
+  $texteItem="has access to the upload personal OpenOffice model .";
+  if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+	$tbs_message = 'Error during the loading of '.$titreItem;
+}
+//=======================================================================================
+
+/*
+
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td style="font-variant: small-caps;">Un administrateur</td>
+		<td>
+			<table border='0' summary='Administrateur'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAdminImprBulSettings" id="GepiAdminImprBulSettings" value="yes" <?php if (getSettingValue("GepiAdminImprBulSettings")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAdminImprBulSettings' style='cursor: pointer;'> a accès au paramétrage de l'impression des bulletins</label></td>
+			</tr>
+		 */
+$statutItem="administrateur";
+$titreItem='GepiAdminImprBulSettings';
+$texteItem="has access to the parameter setting of the impression of the bulletins ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitAdmin" id="GepiPasswordReinitAdmin" value="yes" <?php if (getSettingValue("GepiPasswordReinitAdmin")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitAdmin' style='cursor: pointer;'> peut réinitialiser lui-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitAdmin';
+$texteItem="can  Re-initialize himself his lost password (<em>if function is activated </em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesModifMaPhotoAdministrateur" id="GepiAccesModifMaPhotoAdministrateur" value="yes" <?php if (getSettingValue("GepiAccesModifMaPhotoAdministrateur")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesModifMaPhotoAdministrateur' style='cursor: pointer;'> a le droit d'envoyer/modifier lui-même sa photo dans 'Gérer mon compte'
+				</label></td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+		 */
+$titreItem='GepiAccesModifMaPhotoAdministrateur';
+$texteItem="has the right to send/modify itself its photograph in ' Managing my account'";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+	<tr>
+		<td style="font-variant: small-caps;">Un <?php echo $gepiSettings['denomination_eleve']; ?></td>
+		<td>
+			<table border='0' summary='Elève'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveEleve" id="GepiAccesReleveEleve" value="yes" <?php if (getSettingValue("GepiAccesReleveEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveEleve' style='cursor: pointer;'> a accès à ses relevés de notes</label></td>
+			</tr>
+		 */
+$statutItem='eleve';
+$titreItem='autorise_edt_eleve';
+$texteItem="has access to his timetable  (also open the right to the parents)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+
+$titreItem='GepiAccesReleveEleve';
+$texteItem="has access to his report booklets ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesOptionsReleveEleve" id="GepiAccesOptionsReleveEleve" value="yes" <?php if (getSettingValue("GepiAccesOptionsReleveEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesOptionsReleveEleve' style='cursor: pointer;'> a accès aux options du relevés de notes (<em>nom court, coef, date des devoirs, ...</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesOptionsReleveEleve';
+$texteItem="has access to the options of the report booklets (<em>short name, coef, date of exams, ...</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the loading of '.$titreItem;
+/*
+
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCahierTexteEleve" id="GepiAccesCahierTexteEleve" value="yes" <?php if (getSettingValue("GepiAccesCahierTexteEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCahierTexteEleve' style='cursor: pointer;'> a accès à son cahier de texte</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCahierTexteEleve';
+$texteItem="has access to its textbook ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitEleve" id="GepiPasswordReinitEleve" value="yes" <?php if (getSettingValue("GepiPasswordReinitEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitEleve' style='cursor: pointer;'> peut réinitialiser lui-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitEleve';
+$texteItem="can Re-initialize himself its lost password  (<em>if the function is activated</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEquipePedaEleve" id="GepiAccesEquipePedaEleve" value="yes" <?php if (getSettingValue("GepiAccesEquipePedaEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEquipePedaEleve' style='cursor: pointer;'> a accès à l'équipe pédagogique le concernant</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEquipePedaEleve';
+$texteItem="has access to the teaching staff relating to him";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCpePPEmailEleve" id="GepiAccesCpePPEmailEleve" value="yes" <?php if (getSettingValue("GepiAccesCpePPEmailEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCpePPEmailEleve' style='cursor: pointer;'> a accès aux adresses email de son CPE et de son professeur principal (<em>paramètre utile seulement si le paramètre suivant est décoché</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCpePPEmailEleve';
+$texteItem="has access to addresses email of its CPE and of his principal professor (<em>parameter useful only if the following parameter is selected</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEquipePedaEmailEleve" id="GepiAccesEquipePedaEmailEleve" value="yes" <?php if (getSettingValue("GepiAccesEquipePedaEmailEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEquipePedaEmailEleve' style='cursor: pointer;'> a accès aux adresses email de l'équipe pédagogique le concernant</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEquipePedaEmailEleve';
+$texteItem="has access to addresses email of the teaching staff relating to his";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;' valign='top'><input type="checkbox" name="GepiAccesReport cardSimpleEleve" id="GepiAccesReport cardSimpleEleve" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimpleEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /><a name='bull_simp_ele'></a></td>
+				<td style='border: 0px;'>
+				<label for='GepiAccesReport cardSimpleEleve' style='cursor: pointer;'> a accès à ses bulletins simplifiés</label>
+				<br />
+				<?php
+					$acces_app_ele_resp=getSettingValue('acces_app_ele_resp');
+					if($acces_app_ele_resp=="") {$acces_app_ele_resp='manuel';}
+					$delais_apres_cloture=getSettingValue('delais_apres_cloture');
+					if(!my_ereg("^[0-9]*$",$delais_apres_cloture)) {$delais_apres_cloture=0;}
+
+					echo "<span style='font-size:x-small'>";
+					if($acces_app_ele_resp=='manuel') {
+						echo "L'accès aux appréciations est donné manuellement dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='date') {
+						echo "L'accès aux appréciations est ouvert à la date saisie dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='periode_close') {
+						echo "L'accès aux appréciations est ouvert automatiquement ";
+						if($delais_apres_cloture>0) {echo $delais_apres_cloture." jours après ";}
+						echo "la clôture de la période par un compte scolarité.";
+					}
+					echo "</span>";
+					echo "<br />";
+					echo "<span style='font-size:x-small'>";
+					echo "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">Gestion générale/Configuration générale</a>";
+					echo "</span>";
+
+				?>
+				</td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimpleEleve';
+$texteItem="has access to his simplified bulletins <br />";
+  $acces_app_ele_resp=getSettingValue('acces_app_ele_resp');
+  if($acces_app_ele_resp=="") {$acces_app_ele_resp='manuel';}
+  $delais_apres_cloture=getSettingValue('delais_apres_cloture');
+  if(!my_ereg("^[0-9]*$",$delais_apres_cloture)) {$delais_apres_cloture=0;}
+  $texteItem.="<em>";
+  if($acces_app_ele_resp=='manuel') {
+	$texteItem.="The access to the appreciations is given manually in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon(this, change, '$themessage')\">Access to the appreciations and opinion of the council</a>.<br />";
+  } elseif($acces_app_ele_resp=='date') {
+	$texteItem.="The access to the appreciations is opened to the date typed in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon(this, change, '$themessage')\">Access to the appreciations and opinion of the council</a>.<br />";
+  } elseif($acces_app_ele_resp=='periode_close') {
+	$texteItem.= "The access to the appreciations is automatically open ";
+	if($delais_apres_cloture>0) {echo $delais_apres_cloture." days after ";}
+	$texteItem.= "the period closure by an account schooling.";
+	$texteItem.= "<br />";
+  }
+  $texteItem.= "Mode of opening of the access is set in <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon(this, change, '$themessage')\"> General management /General configuration</a>";
+  $texteItem.= "</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;' valign='top'><input type="checkbox" name="GepiAccesGraphEleve" id="GepiAccesGraphEleve" value="yes" <?php if (getSettingValue("GepiAccesGraphEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesGraphEleve' style='cursor: pointer;'> a accès à la visualisation graphique de ses résultats</label>
+				<br />
+				<?php
+
+					echo "<span style='font-size:x-small'>";
+					if($acces_app_ele_resp=='manuel') {
+						echo "L'accès aux appréciations est donné manuellement dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='date') {
+						echo "L'accès aux appréciations est ouvert à la date saisie dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='periode_close') {
+						echo "L'accès aux appréciations est ouvert automatiquement ";
+						if($delais_apres_cloture>0) {echo $delais_apres_cloture." jours après ";}
+						echo "la clôture de la période par un compte scolarité.";
+					}
+					echo "</span>";
+					echo "<br />";
+					echo "<span style='font-size:x-small'>";
+					echo "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">Gestion générale/Configuration générale</a>";
+					echo "</span>";
+
+				?>
+				</td>
+			</tr>
+		 */
+$titreItem='GepiAccesGraphEleve';
+$texteItem="has access to the graphic visualization of his results <br />";
+$texteItem.= "<em>";
+if($acces_app_ele_resp=='manuel') {
+  $texteItem.= "The access to the appreciations is given manually in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon(this, change, '$themessage')\">Access to the appreciations and opinion of the council</a>.";
+} elseif($acces_app_ele_resp=='date') {
+  $texteItem.= "The access to the appreciations is opened to the date typed in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon(this, change, '$themessage')\">Access to the appreciations and opinion of the council</a>.";
+} elseif($acces_app_ele_resp=='periode_close') {
+  $texteItem.= "The access to the appreciations is automatically open ";
+  if($delais_apres_cloture>0) {$texteItem.= $delais_apres_cloture." days after ";}
+  $texteItem.= "the period closure by an account schooling.";
+}
+  $texteItem.= "<br />";
+  $texteItem.= "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon(this, change, '$themessage')\"> General management /General configuration</a>";
+  $texteItem.= "</em>";
+
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAEleve" id="AAEleve" value="yes" <?php if (getSettingValue("AAEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAEleve' style='cursor: pointer;'> a accès à ses données d'années antérieures</label></td>
+			</tr>
+		 */
+$titreItem='AAEleve';
+$texteItem="has access to his data of former years ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesModifMaPhotoEleve" id="GepiAccesModifMaPhotoEleve" value="yes" <?php if (getSettingValue("GepiAccesModifMaPhotoEleve")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesModifMaPhotoEleve' style='cursor: pointer;'> a le droit d'envoyer/modifier lui-même sa photo dans 'Gérer mon compte'
+				<br /><em>(voir aussi le module de gestion du trombinoscope pour une gestion plus fine des droits d'acc&egrave;s)</em>
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesModifMaPhotoEleve';
+$texteItem="has the right to send/modify himself his photo in 'Manage my compte'
+				<br /><em>(also see the module of management of the trombinoscope for a finer management of the rights of access)</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEleTrombiTousEleves" id="GepiAccesEleTrombiTousEleves" value="yes" <?php if (getSettingValue("GepiAccesEleTrombiTousEleves")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEleTrombiTousEleves' style='cursor: pointer;'> a accès au trombinoscope de tous les <?php echo $gepiSettings['denomination_eleves']; ?> de l'établissement.<br />
+				<em>(sous réserve que le module Trombinoscope-élève soit activé.<br />voir aussi le module de gestion du trombinoscope pour une gestion plus fine des droits d'acc&egrave;s)</em>
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEleTrombiTousEleves';
+$texteItem="has access to the trombinoscope of all the ".$gepiSettings['denomination_eleves']." of the school.<br />
+				<em>(if the Trombinoscope-student module is activated.<br />also see the module of management of the trombinoscope for a finer management of the rights of access)</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEleTrombiElevesClasse" id="GepiAccesEleTrombiElevesClasse" value="yes" <?php if (getSettingValue("GepiAccesEleTrombiElevesClasse")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEleTrombiElevesClasse' style='cursor: pointer;'> a accès au trombinoscope des <?php echo $gepiSettings['denomination_eleves']; ?> de sa classe.<br />
+				<em>(sous réserve que le module Trombinoscope-élève soit activé.<br />voir aussi le module de gestion du trombinoscope pour une gestion plus fine des droits d'acc&egrave;s)</em>
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEleTrombiElevesClasse';
+$texteItem="has access to the trombinoscope of ".$gepiSettings['denomination_eleves']." of his class.<br />
+				<em>(if the Trombinoscope-student module is activated.<br />
+				to also see the module of management of the trombinoscope for a finermanagement of the rights of access)</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEleTrombiPersonnels" id="GepiAccesEleTrombiPersonnels" value="yes" <?php if (getSettingValue("GepiAccesEleTrombiPersonnels")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEleTrombiPersonnels' style='cursor: pointer;'> a accès au trombinoscope de tous les personnels de l'établissement.<br />
+				<em>(sous réserve que le module Trombinoscope-personnels soit activé.<br />voir aussi le module de gestion du trombinoscope pour une gestion plus fine des droits d'acc&egrave;s)</em>
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEleTrombiPersonnels';
+$texteItem="has access to the trombinoscope of all the personnel of the school .<br />
+			<em>(if the module Trombinoscope-personnel is activated.<br />
+			to also see the module of management of the trombinoscope for a finer management of the rights of access)</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEleTrombiProfsClasse" id="GepiAccesEleTrombiProfsClasse" value="yes" <?php if (getSettingValue("GepiAccesEleTrombiProfsClasse")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEleTrombiProfsClasse' style='cursor: pointer;'> a accès au trombinoscope des <?php echo $gepiSettings['denomination_professeurs']; ?> de sa classe.<br />
+				<em>(sous réserve que le module Trombinoscope-personnels soit activé.<br />voir aussi le module de gestion du trombinoscope pour une gestion plus fine des droits d'acc&egrave;s)</em>
+				</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEleTrombiProfsClasse';
+$texteItem="has access to the trombinoscope of ".$gepiSettings['denomination_professeurs']." of his class.<br />
+				<em>(if the module Trombinoscope-personnel is activated.<br />
+				also see the module of management of the trombinoscope for a finer management of the rights of access)</em>";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+
+
+
+
+$titreItem='visuEleDisc';
+$texteItem=" has access in the Discipline module to the incidents relating to it.";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+
+
+/*
+
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td style="font-variant: small-caps;">Un <?php echo $gepiSettings['denomination_responsable']; ?></td>
+		<td>
+			<table border='0' summary='Responsable'>
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesReleveParent" id="GepiAccesReleveParent" value="yes" <?php if (getSettingValue("GepiAccesReleveParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReleveParent' style='cursor: pointer;'> a accès aux relevés de notes des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$statutItem='responsable';
+$titreItem='active_absences_parents';
+$texteItem="has access to the absences of ".$gepiSettings['denomination_eleves']."for who he is responsible (display of the typing untreated 4 hours after creation)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+
+$titreItem='GepiAccesReleveParent';
+$texteItem="has access to the report booklets of ".$gepiSettings['denomination_eleves']." for who he is responsible ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesOptionsReleveParent" id="GepiAccesOptionsReleveParent" value="yes" <?php if (getSettingValue("GepiAccesOptionsReleveParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesOptionsReleveParent' style='cursor: pointer;'> a accès aux options du relevés de notes (<em>nom court, coef, date des devoirs,...</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesOptionsReleveParent';
+$texteItem="has access to the options of the report booklets  (<em>short name, coef, date of the exams,...</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCahierTexteParent" id="GepiAccesCahierTexteParent" value="yes" <?php if (getSettingValue("GepiAccesCahierTexteParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCahierTexteParent' style='cursor: pointer;'> a accès au cahier de texte des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCahierTexteParent';
+$texteItem="has access to the textbook of ".$gepiSettings['denomination_eleves']." for who he is responsible ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiPasswordReinitParent" id="GepiPasswordReinitParent" value="yes" <?php if (getSettingValue("GepiPasswordReinitParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiPasswordReinitParent' style='cursor: pointer;'> peut réinitialiser lui-même son mot de passe perdu (<em>si fonction activée</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiPasswordReinitParent';
+$texteItem="can re-initialize himself his lost password (<em>if the function is activated</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEquipePedaParent" id="GepiAccesEquipePedaParent" value="yes" <?php if (getSettingValue("GepiAccesEquipePedaParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEquipePedaParent' style='cursor: pointer;'> a accès à l'équipe pédagogique concernant les <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEquipePedaParent';
+$texteItem="has access to the teaching staff concerning ".$gepiSettings['denomination_eleves']."for who He is responsible ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesCpePPEmailParent" id="GepiAccesCpePPEmailParent" value="yes" <?php if (getSettingValue("GepiAccesCpePPEmailParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesCpePPEmailParent' style='cursor: pointer;'> a accès aux adresses email du CPE et du professeur principal responsables des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable (<em>paramètre utile seulement si le paramètre suivant est décoché</em>)</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesCpePPEmailParent';
+$texteItem="has access to email addresses of the CPE and the principal professor responsibles of ".$gepiSettings['denomination_eleves']." for who He is responsible (<em> parameter useful only if the following parameter is deselected</em>)";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="GepiAccesEquipePedaEmailParent" id="GepiAccesEquipePedaEmailParent" value="yes" <?php if (getSettingValue("GepiAccesEquipePedaEmailParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesEquipePedaEmailParent' style='cursor: pointer;'> a accès aux adresses email de l'équipe pédagogique concernant les <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='GepiAccesEquipePedaEmailParent';
+$texteItem="has access to addresses email of the teaching staff concerning ".$gepiSettings['denomination_eleves']." for who he is responsible";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;' valign='top'><input type="checkbox" name="GepiAccesReport cardSimpleParent" id="GepiAccesReport cardSimpleParent" value="yes" <?php if (getSettingValue("GepiAccesReport cardSimpleParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesReport cardSimpleParent' style='cursor: pointer;'> a accès aux bulletins simplifiés des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label>
+				<br />
+				<?php
+
+					echo "<span style='font-size:x-small'>";
+					if($acces_app_ele_resp=='manuel') {
+						echo "L'accès aux appréciations est donné manuellement dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='date') {
+						echo "L'accès aux appréciations est ouvert à la date saisie dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='periode_close') {
+						echo "L'accès aux appréciations est ouvert automatiquement ";
+						if($delais_apres_cloture>0) {echo $delais_apres_cloture." jours après ";}
+						echo "la clôture de la période par un compte scolarité.";
+					}
+					echo "</span>";
+					echo "<br />";
+					echo "<span style='font-size:x-small'>";
+					echo "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">Gestion générale/Configuration générale</a>";
+					echo "</span>";
+				?>
+				</td>
+			</tr>
+		 */
+$titreItem='GepiAccesReport cardSimpleParent';
+$texteItem="has access to the simplified bulletins of ".$gepiSettings['denomination_eleves']." for who he is responsible<br />";
+
+$texteItem.="<em>";
+if($acces_app_ele_resp=='manuel') {
+  $texteItem.= "The access to the appreciations is given manually in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon(this, change, '$themessage')\"> Access to the appreciations and opinion of the council</a>.";
+} elseif($acces_app_ele_resp=='date') {
+  $texteItem.= "The access to the appreciations is opened to the date typed in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">> Access to the appreciations and opinion of the council</a>.";
+} elseif($acces_app_ele_resp=='periode_close') {
+  $texteItem.= "The access to the appreciations is automatically open ";
+  if($delais_apres_cloture>0) {$texteItem.= $delais_apres_cloture." days after ";}
+  $texteItem.= "the period closure by an account schooling.";
+}
+$texteItem.="<br />";
+$texteItem.= "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">General management/General configuration</a>";
+$texteItem.= "</em>";
+
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<tr valign='top'>
+				<td style='border: 0px;' valign='top'><input type="checkbox" name="GepiAccesGraphParent" id="GepiAccesGraphParent" value="yes" <?php if (getSettingValue("GepiAccesGraphParent")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='GepiAccesGraphParent' style='cursor: pointer;'> a accès à la visualisation graphique des résultats des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label>
+				<br />
+				<?php
+
+					echo "<span style='font-size:x-small'>";
+					if($acces_app_ele_resp=='manuel') {
+						echo "L'accès aux appréciations est donné manuellement dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='date') {
+						echo "L'accès aux appréciations est ouvert à la date saisie dans <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Accès aux appréciations et avis du conseil</a>.";
+					}
+					elseif($acces_app_ele_resp=='periode_close') {
+						echo "L'accès aux appréciations est ouvert automatiquement ";
+						if($delais_apres_cloture>0) {echo $delais_apres_cloture." jours après ";}
+						echo "la clôture de la période par un compte scolarité.";
+					}
+					echo "</span>";
+					echo "<br />";
+					echo "<span style='font-size:x-small'>";
+					echo "Le mode d'ouverture de l'accès se paramètre en <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">Gestion générale/Configuration générale</a>";
+					echo "</span>";
+				?>
+			</td>
+			</tr>
+		 */
+$titreItem='GepiAccesGraphParent';
+$texteItem="has access to the graphic visualization of the results of ".$gepiSettings['denomination_eleves']."for who he is responsible<br />";
+$texteItem.= "<em>";
+if($acces_app_ele_resp=='manuel') {
+  $texteItem.= "The access to the appreciations is given manually in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">Access to the appreciations and opinion of the council</a>.";
+} elseif($acces_app_ele_resp=='date') {
+  $texteItem.= "The access to the appreciations is opened to the date typed in <a href='../classes/acces_appreciations.php' onclick=\"return confirm_abandon (this, change, '$themessage')\">AAccess to the appreciations and opinion of the councill</a>.";
+} elseif($acces_app_ele_resp=='periode_close') {
+  $texteItem.= "The access to the appreciations is automatically open ";
+  if($delais_apres_cloture>0) {echo $delais_apres_cloture." days after ";}
+  $texteItem.= "the period closure by an account schooling.";
+}
+$texteItem.= "<br />";
+$texteItem.= "Mode of opening of the access parameter in <a href='param_gen.php#mode_ouverture_acces_appreciations'  onclick=\"return confirm_abandon (this, change, '$themessage')\">General management/General configuration</a>";
+$texteItem.= "</em>";
+
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+/*
+
+			<!-- Années antérieures -->
+			<tr valign='top'>
+				<td style='border: 0px;'><input type="checkbox" name="AAResponsable" id="AAResponsable" value="yes" <?php if (getSettingValue("AAResponsable")=='yes') echo 'checked="checked"'; ?> onchange='changement();' /></td>
+				<td style='border: 0px;'><label for='AAResponsable' style='cursor: pointer;'> a accès aux données d'années antérieures des <?php echo $gepiSettings['denomination_eleves']; ?> dont il est responsable</label></td>
+			</tr>
+		 */
+$titreItem='AAResponsable';
+$texteItem="has access to the data of former years of ".$gepiSettings['denomination_eleves']." for who he is responsible ";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+
+
+
+
+$titreItem='visuRespDisc';
+$texteItem=" has access in the Discipline module to the incidents concerning the children of which it is responsible.";
+if (!$droitAffiche->set_entree($statutItem, $titreItem, $texteItem))
+  $tbs_message = 'Error during the recording of  '.$titreItem;
+
+/*
+
+			</table>
+		</td>
+	</tr>
+</table>
+<p style="text-align:center;">
+<input type="hidden" name="is_posted" value="1" />
+<input type="submit" name = "OK" value="Save" style="font-variant: small-caps;" />
+</p>
+</form>
+<?php require("../lib/footer.inc.php");?>
+		 *
+		 *
+		 */
+
+$tbs_message = $droitAffiche->get_erreurs();
+
+if (isset($_POST['OK']) AND ($tbs_message=='')) {
+  $tbs_message = "The modifications were recorded !";
+  $post_reussi=TRUE;
+}
+$tbs_msg=$tbs_message;
+
+/****************************************************************
+			BAS DE PAGE
+****************************************************************/
+$tbs_microtime	="";
+$tbs_pmv="";
+require_once ("../lib/footer_template.inc.php");
+
+/****************************************************************
+			On s'assure que le nom du gabarit est bien renseigné
+****************************************************************/
+if ((!isset($_SESSION['rep_gabarits'])) || (empty($_SESSION['rep_gabarits']))) {
+	$_SESSION['rep_gabarits']="origine";
+}
+
+//==================================
+// Décommenter la ligne ci-dessous pour afficher les variables $_GET, $_POST, $_SESSION et $_SERVER pour DEBUG:
+// $affiche_debug=debug_var();
+
+
+$nom_gabarit = '../templates/'.$_SESSION['rep_gabarits'].'/gestion/droit_acces_template.php';
+
+$tbs_last_connection=""; // On n'affiche pas les dernières connexions
+include($nom_gabarit);
+
+// ------ on vide les tableaux -----
+unset($droitAffiche);
+
+
+
+
+?>

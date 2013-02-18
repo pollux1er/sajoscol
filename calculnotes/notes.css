@@ -1,0 +1,51 @@
+s@charset "utf-8";
+/* CSS Document */
+body {
+	background-color: #EAEAEA;
+}
+table{
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	min-width:60%;
+	
+}
+td{
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	}
+tr {
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+}
+.message {
+	color: #F36;
+	text-decoration: blink;
+	text-align: center;
+}
+.noborder {
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+#gauche {
+	width: auto;
+	display: inline;
+	float: left;
+}
+#contenu {
+	width: 80%;
+	text-align: center;
+	display: inline;
+}
+#body {
+	width: 100%;
+	text-align: center;
+	display: inline;
+}

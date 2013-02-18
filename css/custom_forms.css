@@ -1,0 +1,15 @@
+
+input[type="text"], input[type="password"] 
+{
+border: 1px solid #999999;
+height:26px;
+background: url("../images/custom/input-bg.png") repeat-x scroll 0 0 #F9F9F9;
+}
+
+input[type="submit"]
+{
+border: 1px solid #1D4262;
+height:26px;
+background: url("../images/custom/input_submit.jpg") repeat-x scroll 0 0 #F9F9F9;
+color:#FFFFFF;
+}

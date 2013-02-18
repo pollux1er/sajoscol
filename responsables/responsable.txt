@@ -31758,3 +31758,5 @@ CREATE TABLE IF NOT EXISTS s_alerte_mail (id int(11) unsigned NOT NULL auto_incr
 SELECT 1=1 FROM j_eleves_professeurs jep, s_protagonistes sp 
 						  WHERE sp.login=jep.login
 						  AND jep.professeur='atanga';;
+INSERT INTO utilisateurs SET login = 'NAssonti', nom = 'Assontia Patient', prenom = 'N.', password = '', civilite = 'M.', email = 'assontia@gmail.com', statut = 'responsable', etat = 'actif', auth_mode = 'gepi', change_mdp = 'n';
+UPDATE utilisateurs SET change_mdp = 'y' WHERE login='NAssonti';

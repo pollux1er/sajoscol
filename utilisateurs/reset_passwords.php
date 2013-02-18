@@ -26,7 +26,7 @@
 require_once("../lib/initialisations.inc.php");
  function saveAction($sql) {
 	
-	$filename = '../responsables/responsable.txt';
+	/* $filename = '../responsables/responsable.txt';
 	$somecontent = $sql.";\n";
 
 	// Assurons nous que le fichier est accessible en écriture
@@ -49,11 +49,11 @@ require_once("../lib/initialisations.inc.php");
 
 	} else {
 		echo "Le fichier $filename n'est pas accessible en écriture.";
-	}
+	} */
 }
 
 function updateOnline($sql) {
-	$hostname = "173.254.25.235";
+	/* $hostname = "173.254.25.235";
 	$username = "sajoscol_gepi";
 	$password = ";?5tvu45l-Lu";
 	$databasename = "sajoscol_appli";
@@ -70,7 +70,7 @@ function updateOnline($sql) {
 				echo mysql_error();
 			}
 		}
-	}
+	} */
 	
 } 
 extract($_GET, EXTR_OVERWRITE);
@@ -80,7 +80,7 @@ extract($_POST, EXTR_OVERWRITE);
 // Resume session
 $resultat_session = $session_gepi->security_check();
 if ($resultat_session == 'c') {
-	header("Location: ../utilisateurs/mon_compte.php?change_mdp=yes");
+	header("Location: ../utilisateurs/mon_compte.php?change_mdp=no");
 	die();
 } else if ($resultat_session == '0') {
 	header("Location: ../logout.php?auto=1");
@@ -567,8 +567,8 @@ while ($p < $nb_users) {
 
                                 $save_new_pass = Session::change_password_gepi($user_login,$new_password);
                                 if ($save_new_pass) {
-                                    mysql_query("UPDATE utilisateurs SET change_mdp = 'y' WHERE login='$user_login'");
-                               updateOnline("UPDATE utilisateurs SET change_mdp = 'y' WHERE login='$user_login'");
+                                    mysql_query("UPDATE utilisateurs SET change_mdp = 'n' WHERE login='$user_login'");
+                               updateOnline("UPDATE utilisateurs SET change_mdp = 'n' WHERE login='$user_login'");
 							   }
 			}
 		}
@@ -620,8 +620,8 @@ while ($p < $nb_users) {
 			} else {
                                 $save_new_pass = Session::change_password_gepi($user_login,$new_password);
                                 if ($save_new_pass) {
-                                    mysql_query("UPDATE utilisateurs SET change_mdp = 'y' WHERE login='$user_login'");
-									updateOnline("UPDATE utilisateurs SET change_mdp = 'y' WHERE login='$user_login'");                               
+                                    mysql_query("UPDATE utilisateurs SET change_mdp = 'n' WHERE login='$user_login'");
+									updateOnline("UPDATE utilisateurs SET change_mdp = 'n' WHERE login='$user_login'");                               
 							   }
 			}
 		}

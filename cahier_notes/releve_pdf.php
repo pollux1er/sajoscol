@@ -1134,10 +1134,10 @@ while (($nb_eleves_i <= $nb_eleves) and ($nb_boucle < $nb_boucle_a_faire))
 			$pdf->Cell(90,5,'',0,2,'');
 
 			if ( $aff_classe_nom === '1' or $aff_classe_nom === '3' ) {
-				$classe_aff = $pdf->WriteHTML('Class of <B>'.unhtmlentities($classe[$nb_eleves_i]).'<B>');
+				$classe_aff = $pdf->WriteHTML('<B>'.unhtmlentities($classe[$nb_eleves_i]).'<B> Class');
 			}
 			if ( $aff_classe_nom === '2' ) {
-				$classe_aff = $pdf->WriteHTML('Class of <B>'.unhtmlentities($classe_nom_court[$nb_eleves_i]).'<B>');
+				$classe_aff = $pdf->WriteHTML('<B>'.unhtmlentities($classe_nom_court[$nb_eleves_i]).'<B> Class');
 			}
 			if ( $aff_classe_nom === '3' ) {
 				$classe_aff = $pdf->WriteHTML(' ('.unhtmlentities($classe_nom_court[$nb_eleves_i]).')');

@@ -853,9 +853,9 @@ elseif(!isset($_POST['valide_select_eleves'])) {
 	//echo "<input type='hidden' name='un_seul_bull_par_famille' value='non' />\n";
 
 	echo "<p><input type='radio' id='releve_html' name='mode_bulletin' value='html' checked /><label for='releve_html'> HTML Report</label><br />\n";
-	echo "<input type='radio' id='releve_pdf' name='mode_bulletin' value='pdf' onchange='display_div_param_pdf();' /><label for='releve_pdf'> PDF report</label></p>\n";
+	//echo "<input type='radio' id='releve_pdf' name='mode_bulletin' value='pdf' onchange='display_div_param_pdf();' /><label for='releve_pdf'> PDF report</label></p>\n";
 
-	echo "<div id='div_param_pdf'>\n";
+/* 	echo "<div id='div_param_pdf'>\n";
 		//echo "<br />\n";
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='checkbox' name='use_cell_ajustee' id='use_cell_ajustee' value='n' ";
 		if((isset($_SESSION['pref_use_cell_ajustee']))&&($_SESSION['pref_use_cell_ajustee']=='n')) {echo "checked ";}
@@ -882,7 +882,7 @@ elseif(!isset($_POST['valide_select_eleves'])) {
 
 		echo "<br />\n";
 
-	echo "</div>\n";
+	echo "</div>\n"; */
 
 	echo "<script type='text/javascript'>
 	function display_div_param_pdf() {
@@ -1013,7 +1013,7 @@ echo "</script>\n";
 
 
 	if(count($tab_id_classe)>1) {
-		echo "<p>Pour toutes les classes";
+		echo "<p>For all classes ";
 		/*
 		if(count($tab_periode_num)>1) {
 			echo " et toutes les périodes";
@@ -1067,7 +1067,7 @@ echo "</script>\n";
 		}
 		else {
 			echo "<th>\n";
-			echo "Du $display_date_debut au $display_date_fin<br />\n";
+			echo "From $display_date_debut to $display_date_fin<br />\n";
 
 			//echo "<a href=\"javascript:CocheColonneSelectEleves(".$i.",'".$periode."');changement();\"><img src='../images/enabled.png' width='15' height='15' alt='Cocher tous les élèves' /></a> / <a href=\"javascript:DecocheColonneSelectEleves(".$i.",'".$periode."');changement();\"><img src='../images/disabled.png' width='15' height='15' alt='Décocher tous les élèves' /></a>\n";
 			echo "<a href=\"javascript:CocheColonneSelectEleves(".$i.",'".$periode."');\"><img src='../images/enabled.png' width='15' height='15' alt='Check all the student' /></a> / <a href=\"javascript:DecocheColonneSelectEleves(".$i.",'".$periode."');\"><img src='../images/disabled.png' width='15' height='15' alt='Uncheck all the student' /></a>\n";
@@ -1850,9 +1850,9 @@ else {
 
 			if($mode_bulletin!="pdf") {
 				echo "<div class='noprint' style='background-color:white; border: 1px solid red;'>\n";
-				echo "<h2>Classe de ".$classe."</h2>\n";
+				echo "<h2>Class ".$classe."</h2>\n";
 				if($periode_num=="intervalle") {
-					echo "<p><b>Du $display_date_debut au $display_date_fin</b></p>\n";
+					echo "<p><b>From $display_date_debut to $display_date_fin</b></p>\n";
 				}
 				else {
 					echo "<p><b>Period $periode_num</b></p>\n";

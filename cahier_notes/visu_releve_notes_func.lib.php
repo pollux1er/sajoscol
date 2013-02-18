@@ -1123,7 +1123,7 @@ width:".$releve_addressblock_logo_etab_prop."%;\n";
 			echo "</p></td>\n<td style=\"width: 40%;text-align: center;\">\n";
 
 			if ($tab_rel['affiche_adresse'] != "y") {
-				echo "<p class='bulletin'><span class=\"releve_grand\">Classe de ".$tab_rel['eleve'][$i]['classe_nom_complet']."<br />School year ".$gepiYear."</span><br />\n";
+				echo "<p class='bulletin'><span class=\"releve_grand\">".$tab_rel['eleve'][$i]['classe_nom_complet']." Class<br />School year ".$gepiYear."</span><br />\n";
 
 				if ($choix_periode=='intervalle') {
 					echo "Report booklet of <b>".$tab_rel['intervalle']['debut']."</b> to <b>".$tab_rel['intervalle']['fin']."</b>";

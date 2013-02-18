@@ -188,6 +188,7 @@ if ($login_eleve == null and $_SESSION['statut'] == "responsable") {
     echo "<tr valign='top'><td>SCHOOL LIFE</td>\n";
     echo "<td>";
     // On affiche l'email s'il est non nul, si le cpe l'a autorisé, et si l'utilisateur est autorisé par les droits d'accès globaux
+	if($cpe)
     if ($cpe->email!="" AND $cpe->show_email == "yes" AND (
     	($_SESSION['statut'] == "responsable" AND
     			(getSettingValue("GepiAccesEquipePedaEmailParent") == "yes" OR

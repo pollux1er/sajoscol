@@ -31760,3 +31760,5 @@ SELECT 1=1 FROM j_eleves_professeurs jep, s_protagonistes sp
 						  AND jep.professeur='atanga';;
 INSERT INTO utilisateurs SET login = 'NAssonti', nom = 'Assontia Patient', prenom = 'N.', password = '', civilite = 'M.', email = 'assontia@gmail.com', statut = 'responsable', etat = 'actif', auth_mode = 'gepi', change_mdp = 'n';
 UPDATE utilisateurs SET change_mdp = 'y' WHERE login='NAssonti';
+DELETE FROM tempo WHERE num = 'ubqoenr9b229ckapfa69pphgn4';
+DELETE FROM tempo WHERE num = 'ubqoenr9b229ckapfa69pphgn4';

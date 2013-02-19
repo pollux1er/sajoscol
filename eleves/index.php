@@ -33,7 +33,7 @@ function log_debug($texte) {
 require_once("../lib/initialisations.inc.php");
 function saveAction($sql) {
 	
-	$filename = '../responsables/responsable.txt';
+	/* $filename = '../responsables/responsable.txt';
 	$somecontent = $sql.";\n";
 
 	// Assurons nous que le fichier est accessible en écriture
@@ -56,11 +56,11 @@ function saveAction($sql) {
 
 	} else {
 		echo "Le fichier $filename n'est pas accessible en écriture.";
-	}
+	} */
 }
 
 function updateOnline($sql) {
-	$hostname = "173.254.25.235";
+	/* $hostname = "173.254.25.235";
 	$username = "sajoscol_gepi";
 	$password = ";?5tvu45l-Lu";
 	$databasename = "sajoscol_appli";
@@ -77,7 +77,7 @@ function updateOnline($sql) {
 				echo mysql_error();
 			}
 		}
-	}
+	} */
 	
 }
 

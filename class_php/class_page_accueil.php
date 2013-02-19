@@ -823,7 +823,7 @@ class class_page_accueil {
 		}
 	}
 	if ($this->b>0){
-	  $this->creeNouveauTitre('accueil',"Note book",'images/icons/releve.png');
+	  $this->creeNouveauTitre('accueil',"Report Card",'images/icons/releve.png');
 	  return true;
 	}
   }
@@ -848,7 +848,7 @@ class class_page_accueil {
 	}
 
 	if ($this->b>0){
-	  $this->creeNouveauTitre('accueil',"Notes book",'images/icons/releve.png');
+	  $this->creeNouveauTitre('accueil',"Report card",'images/icons/releve.png');
 	  return true;
 	}
   }

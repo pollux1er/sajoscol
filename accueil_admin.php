@@ -158,7 +158,8 @@ $titre = array(
 "Management of IDA",
 "Management of the trombinoscope",
 "Management of the mef (levels)",
-"Management of the table SSO "    
+"Management of the table SSO ",    
+"SMS "    
 );
 
 $expli = array(
@@ -180,6 +181,7 @@ $expli = array(
 "Locate personnel/".$gepiSettings['denomination_eleves']." not having a photograph.
 <br />Empty the folder of the photographs,...",
 "Management of the mef (levels)",
+"Management of the table of correspondence of the identifiers for the SSO " ,    
 "Management of the table of correspondence of the identifiers for the SSO "     
 );
 
@@ -220,6 +222,7 @@ if ($affiche=='yes') {
 				$tbs_menu[$nummenu]['entree'][]=array('lien'=>$adresse , 'titre'=>$titre[$i], 'expli'=>$expli[$i]);
 			}
 		}
+		$tbs_menu[$nummenu]['entree'][]=array('lien'=>'sms/index.php' , 'titre'=>'SMS', 'expli'=>'Send SMS to parents');
     
 }
 

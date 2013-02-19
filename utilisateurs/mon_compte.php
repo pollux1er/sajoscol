@@ -78,7 +78,7 @@ function updateOnline($sql) {
 
 // On teste si on affiche le message de changement de mot de passe
 if (isset($_GET['change_mdp'])) $affiche_message = 'yes';
-$message_enregistrement = "Par sécurité, vous devez changer votre mot de passe.";
+$message_enregistrement = "For security reasons, you should change you password.";
 
 // Resume session
 if ($session_gepi->security_check() == '0') {
